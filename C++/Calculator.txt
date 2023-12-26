@@ -1,0 +1,137 @@
+#include <iostream>
+
+using namespace std;
+
+class ratNum
+{
+public:
+    int numerator;
+    int denominator;
+    ratNum(int n,int d=1):numerator(n),denominator(d)
+    {}
+    ratNum(double l);
+
+    void power(int n);
+    void reduce();
+};
+
+ratNum::ratNum(double l)
+{
+    int pom=(int)l;
+    int m=1;
+    while(l!=pom)
+    {
+        l*=10;
+        m*=10;;
+        pom=int(l);
+    }
+    numerator=l;
+    denominator=m;
+}
+
+int LCD(int x, int y)
+{
+    if(y!=0)
+    	return LCD(y,x%y);
+	
+    return x;
+}
+
+void ratNum::reduce()
+{
+    int nwd=LCD(abs(numerator),denominator);
+    numerator/=nwd;
+    denominator/=nwd;
+}
+
+void ratNum::power(int n)
+{
+    for(int i=0; i<n-1; i++)
+    {
+        static int l=numerator;
+        static int m=denominator;
+        numerator*=l;
+        denominator*=m;
+    }
+}
+
+ratNum operator+(ratNum a, ratNum b)
+{
+    ratNum c(1,1);
+    int nwd1=LCD(a.denominator, b.denominator);
+    c.numerator=a.numerator*(b.denominator/nwd1)+b.numerator*(a.denominator/nwd1);
+    int nwd2=LCD(abs(c.numerator),nwd1); 
+    c.numerator=c.numerator/nwd2;
+    c.denominator=(a.denominator/nwd1)*(b.denominator/nwd2);
+
+    return c;
+}
+
+ratNum operator-(ratNum a, ratNum b)
+{
+    ratNum c(1,1);
+    int nwd1=LCD(a.denominator, b.denominator);
+    c.numerator=a.numerator*(b.denominator/nwd1)-b.numerator*(a.denominator/nwd1);
+    int nwd2=LCD(abs(c.numerator),nwd1);
+    c.numerator=c.numerator/nwd2;
+    c.denominator=(a.denominator/nwd1)*(b.denominator/nwd2);
+
+    return c;
+}
+
+ratNum operator*(ratNum a, ratNum b)
+{
+    return ratNum(a.numerator*b.numerator,a.denominator*b.denominator);
+}
+
+ratNum operator/(ratNum a, ratNum b)
+{
+    return ratNum(a.numerator*b.denominator,a.denominator*b.numerator);
+}
+
+ostream& operator<<(ostream& display, ratNum &c)
+{
+    c.reduce();
+    if(c.denominator==1)
+        display << c.numerator;
+    else
+        display << c.numerator << "/" << c.denominator;
+    return display;
+}
+
+int main()
+{
+
+    char option,hyphen;
+    ratNum a(1,1);
+    ratNum b(1,1);
+    ratNum c(1,1);
+
+    do
+    {
+        cout << "Calculator" << endl;
+        cout << "Choose an option \n sum(+) \n subtraction(-) \n multiplication(*) \n division(/)"
+        << "\npower(p) \nreduction(r) \nexit(e)" << endl;
+        cin >> option;
+        system("cls");
+        cout << "Enter first rational number in the format numerator/denomiator" << endl;
+        cin >> a.numerator >> hyphen >> a.denominator;
+        cout << "Enter second rational number in the format numerator/denomiator" << endl;
+        cin >> b.numerator >> hyphen >> b.denominator;
+
+        switch(option)
+            {
+            case '+':
+                c=a+b;
+                cout << a << " + " << b << " = "<< c << endl;
+                break;
+            case '-':
+                c=a-b;
+                cout << a << " - " << b << " = "<< c << endl;
+                break;
+            }
+    }while(option!='w');
+
+
+    return 0;
+}
